@@ -35,15 +35,15 @@ public class UserExceptionHandler extends ResponseEntityExceptionHandler  {
 	@Autowired
 	private MessageSource messageSource;
 	
-	@Override
-	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers,  HttpStatus status, WebRequest request) {
-		
-		String mensagem = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
-		
-		List<Erro> listError = Arrays.asList(new Erro(mensagem));
-		
-		return handleExceptionInternal(ex, listError, headers, status, request) ;
-	}
+//	@Override
+//	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers,  HttpStatus status, WebRequest request) {
+//		
+//		String mensagem = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
+//		
+//		List<Erro> listError = Arrays.asList(new Erro(mensagem));
+//		
+//		return handleExceptionInternal(ex, listError, headers, status, request) ;
+//	}
 	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -56,11 +56,13 @@ public class UserExceptionHandler extends ResponseEntityExceptionHandler  {
 	protected ResponseEntity<Object> handleDataIntegrityViolationException(CustomException ex, WebRequest request) {
 		
 		String messageKey = ex.getErrorCode().getMessageKey();
+		HttpStatus httpsStatus = ex.getErrorCode().getHttpStatus();
+		
 		String message = this.messageSource.getMessage(messageKey, null, LocaleContextHolder.getLocale());
 		
 		List<Erro> listError = Arrays.asList(new Erro(message));
 		
-		return handleExceptionInternal(ex, listError, new HttpHeaders(), HttpStatus.NOT_FOUND, request) ;
+		return handleExceptionInternal(ex, listError, new HttpHeaders(), httpsStatus, request) ;
 	}
 
 	private List<Erro> criaListaErro(BindingResult binding) {

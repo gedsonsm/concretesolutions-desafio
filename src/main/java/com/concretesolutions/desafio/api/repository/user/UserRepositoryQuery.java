@@ -8,5 +8,5 @@ package com.concretesolutions.desafio.api.repository.user;
  *
  */
 public interface UserRepositoryQuery {
-
+	
 }

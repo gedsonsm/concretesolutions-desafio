@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.concretesolutions.desafio.api.model.User;
 import com.concretesolutions.desafio.api.repository.UserRepository;
 import com.concretesolutions.desafio.api.service.exception.ExistingUserException;
+import com.concretesolutions.desafio.api.service.exception.UserNotFoundException;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -38,9 +39,7 @@ public class UserService {
 		{
 			user.setToken(createJWT());
 			
-			User savedUser = this.userRepository.save(user);
-			
-			return savedUser;
+			return this.userRepository.save(user);
 			
 		} catch (DataIntegrityViolationException e) {
 			
@@ -48,7 +47,19 @@ public class UserService {
 		}
 	}
 	
-	public static String createJWT() {
+	public User login(User userReceived) {
+		
+		User userFound = this.userRepository.findByEmail(userReceived.getEmail());
+		
+		if(userFound == null || !userFound.getPassword().equals(userReceived.getPassword())) {
+			
+			throw new UserNotFoundException();
+		}
+		
+		return userFound;
+	}
+	
+	private static String createJWT() {
 		  
 	    SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
