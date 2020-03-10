@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.concretesolutions.desafio.api.model.User;
-import com.concretesolutions.desafio.api.repository.UserRepository;
+import com.concretesolutions.desafio.api.service.UserService;
 
 /**
  * Endpoint for login, user creation and user consultation
@@ -26,12 +26,12 @@ import com.concretesolutions.desafio.api.repository.UserRepository;
 public class UserResource {
 	
 	@Autowired
-	private UserRepository userRepository;
+	private UserService userService;
 
 	@PostMapping
-	public ResponseEntity<User> createUser(@Valid @RequestBody User user)
-	{
-		User savedUser = userRepository.save(user);
+	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+		
+		User savedUser = this.userService.createUser(user);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
 	}
