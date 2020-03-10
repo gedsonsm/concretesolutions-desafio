@@ -3,8 +3,8 @@ CREATE TABLE user (
     name VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(50) NOT NULL,
-    created Date NOT NULL,
-    modified Date NOT NULL,
-    last_login Date NOT NULL,
+    created DATETIME NOT NULL,
+    modified DATETIME NOT NULL,
+    last_login DATETIME NOT NULL,
     token VARCHAR(100) NOT NULL
 );

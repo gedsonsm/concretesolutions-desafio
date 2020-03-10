@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 	
 	EXISTING_EMAIL("user.existing-email", HttpStatus.CONFLICT),
-	USER_NOT_FOUND("user.not-found", HttpStatus.UNAUTHORIZED);
+	USER_NOT_FOUND("user.not-found", HttpStatus.UNAUTHORIZED),
+	UNAUTHORIZED_USER("user.unauthorized", HttpStatus.UNAUTHORIZED),
+	INVALID_SESSION("user.invalid-session", HttpStatus.UNAUTHORIZED);
 	
 	private String messageKey;
 	private HttpStatus httpStatus;
