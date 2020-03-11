@@ -6,10 +6,14 @@ package com.concretesolutions.desafio.api.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.concretesolutions.desafio.api.dto.UserDTO;
 import com.concretesolutions.desafio.api.model.User;
 import com.concretesolutions.desafio.api.repository.UserRepository;
 import com.concretesolutions.desafio.api.service.exception.ExistingUserException;
@@ -17,6 +21,8 @@ import com.concretesolutions.desafio.api.service.exception.InvalidSessionExcepti
 import com.concretesolutions.desafio.api.service.exception.UserNotFoundException;
 import com.concretesolutions.desafio.api.service.exception.UserUnauthorizedException;
 import com.concretesolutions.desafio.api.util.TokenUtil;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Service to manipulate user
@@ -28,11 +34,27 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+    private final Environment env;
+    
+    private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    
+    public UserService(Environment env) {
+        this.env = requireNonNull(env);
+    }
 
-	public User createUser(User user) {
+	public User createUser(UserDTO userDTO) {
 
 		try {
-			user.setToken(TokenUtil.createJWT());
+			
+			User user = new User();
+			
+			BeanUtils.copyProperties(userDTO, user);
+			
+			String token = TokenUtil.createJWT(user.getName(), env.getProperty("jwt.issuer"), env.getProperty("jwt.secret"));
+			
+			user.setToken(this.bCryptPasswordEncoder.encode(token));
+			user.setPassword(this.bCryptPasswordEncoder.encode(user.getPassword()));
 
 			return this.userRepository.save(user);
 
@@ -42,11 +64,11 @@ public class UserService {
 		}
 	}
 
-	public User login(User userReceived) {
+	public User login(String email, String password) {
 
-		User userFound = this.userRepository.findByEmail(userReceived.getEmail());
+		User userFound = this.userRepository.findByEmail(email);
 
-		if (userFound == null || !userFound.getPassword().equals(userReceived.getPassword())) {
+		if (userFound == null || !bCryptPasswordEncoder.matches(password, userFound.getPassword())) {
 
 			throw new UserNotFoundException();
 		}
@@ -71,7 +93,7 @@ public class UserService {
 			throw new UserUnauthorizedException();
 		}
 
-		if (!user.getToken().equals(token)) {
+		if (!token.equals(user.getToken())) {
 			throw new UserUnauthorizedException();
 		}
 	}

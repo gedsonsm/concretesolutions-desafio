@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.concretesolutions.desafio.api.dto.LoginDTO;
+import com.concretesolutions.desafio.api.dto.UserDTO;
 import com.concretesolutions.desafio.api.model.User;
 import com.concretesolutions.desafio.api.service.UserService;
 
@@ -32,7 +34,7 @@ public class UserResource {
 	private UserService userService;
 
 	@PostMapping("/create")
-	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+	public ResponseEntity<User> createUser(@Valid @RequestBody UserDTO user) {
 		
 		User savedUser = this.userService.createUser(user);
 		
@@ -40,9 +42,9 @@ public class UserResource {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<User> login(@Valid @RequestBody User user) {
+	public ResponseEntity<User> login(@Valid @RequestBody LoginDTO login) {
 		
-		User savedUser = this.userService.login(user);
+		User savedUser = this.userService.login(login.getEmail(), login.getPassword());
 		
 		return ResponseEntity.ok(savedUser);
 	}
