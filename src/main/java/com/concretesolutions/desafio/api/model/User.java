@@ -3,15 +3,26 @@
  */
 package com.concretesolutions.desafio.api.model;
 
-import java.time.LocalDate;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * User model definition
@@ -20,11 +31,15 @@ import org.hibernate.annotations.GenericGenerator;
  */
 @Entity
 @Table(name = "user")
+@Getter
+@Setter
+@EqualsAndHashCode
 public class User {
 
 	@Id
 	@GeneratedValue(generator="system-uuid")
 	@GenericGenerator(name="system-uuid", strategy = "uuid")
+	@Column(name = "user_id")
 	private String id;
 	
 	private String name;
@@ -33,93 +48,22 @@ public class User {
 	
 	private String password;
 	
-	private LocalDate created;
+	private LocalDateTime created;
 	
-	private LocalDate modified;
+	private LocalDateTime modified;
 	
+	private LocalDateTime lastLogin;
+	
+	private String token;
+	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "user_id")
+	@JsonIgnore
+	private List<Phone> phones;
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
+	public User()
+	{
+		created = modified = lastLogin = LocalDateTime.now();
+		phones = new ArrayList<>();
 	}
-	
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	/**
-	 * @return the email
-	 */
-	public String getEmail() {
-		return email;
-	}
-	
-	/**
-	 * @param email the email to set
-	 */
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
-	
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	/**
-	 * @return the created
-	 */
-	public LocalDate getCreated() {
-		return created;
-	}
-	
-	/**
-	 * @param created the created to set
-	 */
-	public void setCreated(LocalDate created) {
-		this.created = created;
-	}
-	
-	/**
-	 * @return the modified
-	 */
-	public LocalDate getModified() {
-		return modified;
-	}
-	
-	/**
-	 * @param modified the modified to set
-	 */
-	public void setModified(LocalDate modified) {
-		this.modified = modified;
-	}
-	
 }
