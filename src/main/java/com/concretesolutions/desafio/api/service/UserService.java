@@ -3,6 +3,8 @@
  */
 package com.concretesolutions.desafio.api.service;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -14,15 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.concretesolutions.desafio.api.dto.UserDTO;
+import com.concretesolutions.desafio.api.enums.ErrorCode;
 import com.concretesolutions.desafio.api.model.User;
 import com.concretesolutions.desafio.api.repository.UserRepository;
-import com.concretesolutions.desafio.api.service.exception.ExistingUserException;
-import com.concretesolutions.desafio.api.service.exception.InvalidSessionException;
-import com.concretesolutions.desafio.api.service.exception.UserNotFoundException;
-import com.concretesolutions.desafio.api.service.exception.UserUnauthorizedException;
+import com.concretesolutions.desafio.api.service.exception.CustomException;
 import com.concretesolutions.desafio.api.util.TokenUtil;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Service to manipulate user
@@ -46,7 +44,6 @@ public class UserService {
 	public User createUser(UserDTO userDTO) {
 
 		try {
-			
 			User user = new User();
 			
 			BeanUtils.copyProperties(userDTO, user);
@@ -60,7 +57,7 @@ public class UserService {
 
 		} catch (DataIntegrityViolationException e) {
 
-			throw new ExistingUserException();
+			throw new CustomException(ErrorCode.EXISTING_EMAIL);
 		}
 	}
 
@@ -68,9 +65,9 @@ public class UserService {
 
 		User userFound = this.userRepository.findByEmail(email);
 
-		if (userFound == null || !bCryptPasswordEncoder.matches(password, userFound.getPassword())) {
+		if (userFound == null || !this.bCryptPasswordEncoder.matches(password, userFound.getPassword())) {
 
-			throw new UserNotFoundException();
+			throw new CustomException(ErrorCode.USER_NOT_FOUND);
 		}
 
 		userFound.setLastLogin(LocalDateTime.now());
@@ -78,9 +75,9 @@ public class UserService {
 		return userFound;
 	}
 
-	public User findValidProfile(String token, String id) {
+	public User findValidProfile(String id) {
 
-		User userFound = findUserById(id);
+		User userFound = this.findUserById(id);
 
 		this.validateLoginTime(userFound.getLastLogin());
 
@@ -89,12 +86,8 @@ public class UserService {
 
 	public void validateToken(String token, User user) {
 		
-		if (token == null) {
-			throw new UserUnauthorizedException();
-		}
-
-		if (!token.equals(user.getToken())) {
-			throw new UserUnauthorizedException();
+		if (token == null || !token.equals(user.getToken())) {
+			throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
 		}
 	}
 
@@ -103,7 +96,7 @@ public class UserService {
 		Optional<User> userOptional = this.userRepository.findById(id);
 
 		if (!userOptional.isPresent()) {
-			throw new UserNotFoundException();
+			throw new CustomException(ErrorCode.USER_NOT_FOUND);
 		}
 
 		return userOptional.get();
@@ -114,7 +107,7 @@ public class UserService {
 		LocalDateTime nowMinus30 = LocalDateTime.now().minusMinutes(30);
 
 		if (nowMinus30.isAfter(lastLogin)) {
-			throw new InvalidSessionException();
+			throw new CustomException(ErrorCode.INVALID_SESSION);
 		}
 	}
 

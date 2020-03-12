@@ -50,9 +50,9 @@ public class UserResource {
 	}
 	
 	@GetMapping("/profile/{id}")
-	public ResponseEntity<User> userProfile(@RequestHeader("token") String token, @PathVariable String id) {
+	public ResponseEntity<User> userProfile(@RequestHeader(name= "token", required = false) String token, @PathVariable String id) {
 		
-		User foundUser = this.userService.findValidProfile(token, id);
+		User foundUser = this.userService.findValidProfile(id);
 		
 		this.userService.validateToken(token, foundUser);
 		

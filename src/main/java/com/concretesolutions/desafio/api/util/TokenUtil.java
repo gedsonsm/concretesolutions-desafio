@@ -10,13 +10,9 @@ import java.util.UUID;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
-import org.springframework.core.env.Environment;
-
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * @author Gedson

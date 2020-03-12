@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * DTO with the necessary information for login
+ * 
  * @author Gedson
  */
 @Getter

@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * DTO with the necessary information to register a user
+ * 
  * @author Gedson
  */
 @Getter

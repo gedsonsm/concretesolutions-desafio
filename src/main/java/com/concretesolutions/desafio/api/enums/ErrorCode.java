@@ -2,6 +2,11 @@ package com.concretesolutions.desafio.api.enums;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * Mapping of error messages with their respective http status
+ * 
+ * @author Gedson
+ */
 public enum ErrorCode {
 	
 	EXISTING_EMAIL("user.existing-email", HttpStatus.CONFLICT),
