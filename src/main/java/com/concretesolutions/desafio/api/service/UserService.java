@@ -32,24 +32,32 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
-	
-    private final Environment env;
-    
-    private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-    
-    public UserService(Environment env) {
-        this.env = requireNonNull(env);
-    }
 
+	private final Environment env;
+
+	private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
+	public UserService(Environment env) {
+		this.env = requireNonNull(env);
+	}
+
+	/**
+	 * Method will generate a token for the user, perform the token and password
+	 * encryption and persist the user
+	 * 
+	 * @param Object received for user registration {@link UserDTO}
+	 * @return User model saved {@link User}
+	 */
 	public User createUser(UserDTO userDTO) {
 
 		try {
 			User user = new User();
-			
+
 			BeanUtils.copyProperties(userDTO, user);
-			
-			String token = TokenUtil.createJWT(user.getName(), env.getProperty("jwt.issuer"), env.getProperty("jwt.secret"));
-			
+
+			String token = TokenUtil.createJWT(user.getName(), env.getProperty("jwt.issuer"),
+					env.getProperty("jwt.secret"));
+
 			user.setToken(this.bCryptPasswordEncoder.encode(token));
 			user.setPassword(this.bCryptPasswordEncoder.encode(user.getPassword()));
 
@@ -61,6 +69,13 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * The Method validates if the email and password are valid for the login, if positive it returns the user's data
+	 * 
+	 * @param Email of the user who is logging in 
+	 * @param Sassword of the user who is performing the login
+	 * @return Data of the user who logged in
+	 */
 	public User login(String email, String password) {
 
 		User userFound = this.userRepository.findByEmail(email);
@@ -75,6 +90,13 @@ public class UserService {
 		return userFound;
 	}
 
+	/**
+	 * 
+	 * Performs a user search from the id and validates if the login time has been exceeded
+	 * 
+	 * @param User identifier
+	 * @return Data of the user {@link User}
+	 */
 	public User findValidProfile(String id) {
 
 		User userFound = this.findUserById(id);
@@ -84,9 +106,16 @@ public class UserService {
 		return userFound;
 	}
 
-	public void validateToken(String token, User user) {
-		
-		if (token == null || !token.equals(user.getToken())) {
+	/**
+	 * 
+	 * Validates whether the token was received and is the same as the user's
+	 * 
+	 * @param tokenReceived - Token received for validation
+	 * @param userToken - Token retrieved from user for validation of what was received
+	 */
+	public void validateToken(String tokenReceived, String userToken) {
+
+		if (tokenReceived == null || !tokenReceived.equals(userToken)) {
 			throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
 		}
 	}
