@@ -54,7 +54,7 @@ public class UserResource {
 		
 		User foundUser = this.userService.findValidProfile(id);
 		
-		this.userService.validateToken(token, foundUser);
+		this.userService.validateToken(token, foundUser.getToken());
 		
 		return ResponseEntity.ok(foundUser);
 	}
