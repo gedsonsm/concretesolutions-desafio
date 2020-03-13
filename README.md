@@ -38,6 +38,8 @@ http://{IP}:{PORTA}/user/login
 ```
 
 ## Perfil do Usuário
+
+* EndPoint (POST):
 http://{IP}:{PORTA}/user/profile/${user_id}
 
 * Informações do Header:
